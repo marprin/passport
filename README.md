@@ -1,6 +1,8 @@
 # Passport
 
 ## Setup
+Please install [mysql](https://www.mysql.com/) first before continue to next steps
+
 Before install the requirements, you can choose to install directly, using virtualenv, or using [Docker](https://www.docker.com/)
 
 ### A. Setup Using Virtualenv
