@@ -1,0 +1,10 @@
+*.pyc
+*.sqlite3
+*.sqlite
+*.pyo
+*.so
+idea/*
+.idea/*
+.vscode/*
+my.cnf
+.coverage

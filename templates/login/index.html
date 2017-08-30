@@ -1,0 +1,45 @@
+{% extends 'login/layout/master.html' %}
+{% load staticfiles %}
+
+{% block content %}
+
+<div class="row mt-5">
+    <div class="col-lg-6 offset-lg-3 col-md-8 offset-md-2 col-sm-10 offset-sm-1 col-xs-12">
+        <div class="card">
+            <div class="card-header text-center">
+                <h4>Login</h4>
+            </div>
+            <div class="card-block">
+                <form action="{% url 'login:index' %}" method="POST">
+                    {% csrf_token %}
+                    <input type="hidden" name="redirect_url" value="{{ redirect_url }}">
+                    <div class="form-group">
+                        <label for="emailInput">Email</label>
+                        <input type="text" class="form-control" name="email" id="emailInput" placeholder="Silahkan memasukkan email anda" value="{{ email }}">
+                        {% if email_error %}
+                            <small class="text-muted form-text text-danger">{{ email_error }}</small>
+                        {% endif %}
+                    </div>
+                    <div class="form-group">
+                        <label for="passwordInput">Password</label>
+                        <input type="password" class="form-control" name="password" id="passwordInput" placeholder="Silahkan memasukkan password anda" value="{{ password }}">
+                        {% if password_error %}
+                            <small class="text-muted form-text text-danger">{{ email_error }}</small>
+                        {% endif %}
+                    </div>
+                    <div class="form-group">
+                        {% if error %}
+                            <small class="text-muted form-text text-danger">{{ error }}</small>
+                        {% endif %}
+                        <button type="submit" class="btn btn-primary col-lg-12">Sign in</button>
+                    </div>
+                </form>
+            </div>
+            <div class="card-footer text-center">
+                2017
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

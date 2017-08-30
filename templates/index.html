@@ -1,0 +1,65 @@
+{% load staticfiles %}
+
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+    <!-- Required meta tags -->
+    <title>Login</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}" crossorigin="anonymous">
+    <link rel="stylesheet" href="{% static 'css/bootstrap-reboot.min.css' %}">
+    </head>
+    <body>
+    <div class="container">
+        <div class="row mt-5">
+            <div class="col-lg-6 offset-lg-3 col-md-8 offset-md-2 col-sm-10 offset-sm-1 col-xs-12">
+                <div class="card">
+            <div class="card-header text-center">
+                <h4>Login</h4>
+            </div>
+            <div class="card-block">
+                <form action="{% url 'login:index' %}" method="POST">
+                    {% csrf_token %}
+                    <input type="hidden" name="redirect_url" value="{{ redirect_url }}">
+                    <div class="form-group">
+                        <label for="emailInput">Email</label>
+                        <input type="text" class="form-control" name="email" id="emailInput" placeholder="Silahkan memasukkan email anda" value="{{ email }}">
+                        {% if email_error %}
+                            <small class="text-muted form-text text-danger">{{ email_error }}</small>
+                        {% endif %}
+                    </div>
+                    <div class="form-group">
+                        <label for="passwordInput">Password</label>
+                        <input type="password" class="form-control" name="password" id="passwordInput" placeholder="Silahkan memasukkan password anda" value="{{ password }}">
+                        {% if password_error %}
+                            <small class="text-muted form-text text-danger">{{ email_error }}</small>
+                        {% endif %}
+                    </div>
+                    <div class="form-group">
+                        {% if error %}
+                            <small class="text-muted form-text text-danger">{{ error }}</small>
+                        {% endif %}
+                        <button type="submit" class="btn btn-primary col-lg-12">Sign in</button>
+                    </div>
+                </form>
+            </div>
+            <div class="card-footer text-center">
+                2017
+            </div>
+        </div>
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript">
+    var assetPath = "/public/";
+    var redirectSecond = 2000;
+    </script>
+    <!-- jQuery first, then Tether, then Bootstrap JS. -->
+    <script src= "{% static 'js/jquery.min.js' %}" integrity="sha384-A7FZj7v+d/sdmMqp/nOQwliLvUsJfDHW+k9Omg/a/EheAdgtzNs3hpfag6Ed950n" crossorigin="anonymous"></script>
+    <script src="{% static 'js/tether.min.js' %}" integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb" crossorigin="anonymous"></script>
+    <script src="{% static 'js/bootstrap.min.js' %}" integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn" crossorigin="anonymous"></script>
+    </body>
+</html>
