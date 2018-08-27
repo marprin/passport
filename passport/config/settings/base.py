@@ -53,7 +53,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'passport.urls'
+ROOT_URLCONF = 'passport.config.urls'
 
 TEMPLATES = [
     {
@@ -71,7 +71,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'passport.wsgi.application'
+WSGI_APPLICATION = 'passport.config.wsgi.application'
 
 
 # Database

@@ -1,0 +1,1 @@
+from passport.config.settings.base import *
