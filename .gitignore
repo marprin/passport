@@ -9,3 +9,4 @@ idea/*
 my.cnf
 .coverage
 .env
+/venv
