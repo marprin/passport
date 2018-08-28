@@ -1,5 +1,5 @@
-from passport.login.models import OauthClient, OauthGrant, OauthAccessToken, User
-from passport.common.helper import get_today_date, add_minutes_from_now, random_string, add_days_from_today
+from login.models import OauthClient, OauthGrant, OauthAccessToken, User
+from common.helper import get_today_date, add_minutes_from_now, random_string, add_days_from_today
 from django.conf import settings
 
 def find_oauth_client(redirect_url = None):

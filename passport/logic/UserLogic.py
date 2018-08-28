@@ -1,4 +1,4 @@
-from passport.login.models import User
+from login.models import User
 
 def find_user_by_email(email):
     try:

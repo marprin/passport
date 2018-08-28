@@ -1,8 +1,8 @@
 from django.shortcuts import render
 from django.http import HttpResponseRedirect
 from django.conf import settings
-from passport.common.helper import random_string, get_client_ip, check_password, convert_url
-from passport.logic import OauthLogic, UserLogic
+from common.helper import random_string, get_client_ip, check_password, convert_url
+from logic import OauthLogic, UserLogic
 
 # Create your views here.
 def index(request):

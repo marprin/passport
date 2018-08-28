@@ -14,8 +14,8 @@ import os
 from dotenv import load_dotenv
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-DOTENV_FILE_PATH = os.path.join(os.path.dirname(BASE_DIR), '.env')
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+DOTENV_FILE_PATH = os.path.join(BASE_DIR, '.env')
 load_dotenv(DOTENV_FILE_PATH)
 
 
@@ -23,7 +23,7 @@ load_dotenv(DOTENV_FILE_PATH)
 # See https://docs.djangoproject.com/en/1.11/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'fjeifJFEIF(#$f9*&#$#)@%&FEHW98#0r324723r9328r08rwef'
+SECRET_KEY = os.environ.get('APP_SECRET')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True

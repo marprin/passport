@@ -4,8 +4,8 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework.throttling import AnonRateThrottle
-from passport.login.models import OauthClient, OauthGrant, OauthAccessToken, User
-from passport.logic.OauthLogic import create_oauth_access_token
+from login.models import OauthClient, OauthGrant, OauthAccessToken, User
+from logic.OauthLogic import create_oauth_access_token
 
 # Create your views here.
 
