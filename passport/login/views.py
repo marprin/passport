@@ -1,8 +1,10 @@
 from django.shortcuts import render
 from django.http import HttpResponseRedirect
 from django.conf import settings
-from common.helper import random_string, get_client_ip, check_password, convert_url
-from logic import OauthLogic, UserLogic
+from common.helper import random_string, get_client_ip, check_password, \
+        convert_url, get_today_date, add_minutes_from_now
+from users.models import User
+from oauth.models import Grant, Client
 
 # Create your views here.
 def index(request):
@@ -14,26 +16,36 @@ def index(request):
         'redirect_url': redirect_url,
     }
 
-    if (request.method == 'POST'):
-        if (email is None):
+    if request.method == 'POST':
+        if email is None:
             context['email_error'] = 'Harap memasukkan email'
             return render(request, 'index.html', context)
-        elif (password is None):
+        elif password is None:
             context['password_error'] = 'Harap memasukkan password'
             return render(request, 'index.html', context)
         else:
-            attemp_user = UserLogic.find_user_by_email(email)
+            try:
+                attemp_user = User.objects.get(email=email, confirmed_account = 'Y')
+            except User.DoesNotExist as e:
+                attemp_user = None
 
             if attemp_user is not None:
                 if check_password(str(password), str(attemp_user.password)):
-                    oauth_client = OauthLogic.find_oauth_client(redirect_url)
+                    redirect_url = redirect_url if redirect_url is not None else settings.WEBSITE_URL
+                    try:
+                        oauth_client = Client.objects.get(is_enabled='Y', callback_url=redirect_url)
+                    except Client.DoesNotExist as e:
+                        oauth_client = Client.objects.get(is_enabled='Y', callback_url=settings.WEBSITE_URL)
                     grant_code = str(random_string())
 
-                    # generate a grant_code and return back to the request site
-                    if oauth_client is None:
-                        oauth_client = OauthLogic.find_oauth_client(settings.WEBSITE_URL)
-
-                    OauthLogic.create_oauth_grant(grant_code, oauth_client, attemp_user, get_client_ip(request))
+                    Grant.objects.create(
+                        grant_code = str(grant_code),
+                        client = oauth_client,
+                        user = attemp_user,
+                        ip_address = str(get_client_ip(request)),
+                        created_at = get_today_date(),
+                        expired_at = add_minutes_from_now(settings.GRANT_MINUTES)
+                    )
                     return HttpResponseRedirect(convert_url(oauth_client.callback_url, grant_code))
                 else:
                     context['error'] = 'Please check your email or password'
