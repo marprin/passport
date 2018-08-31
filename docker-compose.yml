@@ -4,7 +4,7 @@ services:
         build: .
         container_name: passport
         restart: always
-        command: bash -c "python manage.py collectstatic --noinput && gunicorn passport.wsgi:application --bind 0.0.0.0:8800 --user=www-data --group=www-data --workers=3 --reload"
+        command: bash -c "python manage.py collectstatic --noinput && gunicorn passport.config.wsgi:application --bind 0.0.0.0:8800 --user=www-data --group=www-data --workers=3 --reload"
         volumes:
             - .:/code
             - /staticfile:/staticfile
