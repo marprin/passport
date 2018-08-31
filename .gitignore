@@ -10,3 +10,4 @@ my.cnf
 .coverage
 .env
 /venv
+htmlcov
