@@ -11,40 +11,49 @@ https://docs.djangoproject.com/en/1.11/ref/settings/
 """
 
 import os
-from dotenv import load_dotenv
+import environ
 
-# Build paths inside the project like this: os.path.join(BASE_DIR, ...)
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
-DOTENV_FILE_PATH = os.path.join(BASE_DIR, '.env')
-load_dotenv(DOTENV_FILE_PATH)
+root = environ.Path(__file__) - 4
+BASE_DIR = root()
+env = environ.Env(DEBUG=(bool, False), )
 
+if os.path.exists(os.path.join(BASE_DIR, '.env')):
+    environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.11/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get('APP_SECRET')
+SECRET_KEY = env('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = env('DEBUG')
 
-ALLOWED_HOSTS = ['*']
-
+ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=['*'])
 
 # Application definition
 
-INSTALLED_APPS = [
+DJANGO_MODULES = (
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+)
 
+THIRD_PARTY_APPS = (
     'rest_framework',
+)
+
+LOCAL_APPS = (
+    'common',
     'login',
-    'common'
-]
+    'oauth',
+    'users',
+)
+
+INSTALLED_APPS = DJANGO_MODULES + THIRD_PARTY_APPS + LOCAL_APPS
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -80,14 +89,10 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/1.11/ref/settings/#databases
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.mysql',
-#         'OPTIONS': {
-#             'read_default_file': os.path.join(BASE_DIR, "my.cnf")
-#         }
-#     }
-# }
+DATABASES = {
+    'default': env.db() # Raises ImproperlyConfigured exception if DATABASE_URL not in os.environ
+}
+DATABASES['default']['ATOMIC_REQUESTS'] = True
 
 
 # Password validation
