@@ -1,0 +1,4 @@
+#!/bin/bash
+coverage run --source='.' $(cd "$(dirname "$0")" && pwd)/manage.py test --settings config.settings.test $*
+coverage html
+coverage report -m
