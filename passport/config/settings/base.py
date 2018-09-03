@@ -48,6 +48,7 @@ THIRD_PARTY_APPS = (
 
 LOCAL_APPS = (
     'common',
+    'config',
     'login',
     'oauth',
     'users',
