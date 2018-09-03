@@ -1,14 +1,20 @@
 version: "2"
+version: '3'
+
 services:
-    passport:
-        build: .
-        container_name: passport
-        restart: always
-        command: bash -c "python manage.py collectstatic --noinput && gunicorn passport.config.wsgi:application --bind 0.0.0.0:8800 --user=www-data --group=www-data --workers=3 --reload"
+    app:
+        build:
+            context: .
+        # restart: always
         volumes:
-            - .:/code
+            - ./:/app
             - /staticfile:/staticfile
         ports:
             - "8800:8800"
-        extra_hosts:
-            - "db:127.0.0.1"
+        env_file:
+            - .env
+        links:
+            - redis
+
+    redis:
+        image: redis:alpine
