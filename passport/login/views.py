@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.http import HttpResponseRedirect
 from django.conf import settings
 from common.helper import random_string, get_client_ip, check_password, \
-        convert_url, get_today_date, add_minutes_from_now
+        convert_url, add_minutes_from_now
 from users.models import User
 from oauth.models import Grant, Client
 
@@ -18,14 +18,14 @@ def index(request):
 
     if request.method == 'POST':
         if email is None:
-            context['email_error'] = 'Harap memasukkan email'
+            context['email_error'] = 'Please input your email'
             return render(request, 'index.html', context)
         elif password is None:
-            context['password_error'] = 'Harap memasukkan password'
+            context['password_error'] = 'Please input your password'
             return render(request, 'index.html', context)
         else:
             try:
-                attemp_user = User.objects.get(email=email, confirmed_account = 'Y')
+                attemp_user = User.objects.get(email=email, confirmed_account=True)
             except User.DoesNotExist as e:
                 attemp_user = None
 
@@ -33,9 +33,9 @@ def index(request):
                 if check_password(str(password), str(attemp_user.password)):
                     redirect_url = redirect_url if redirect_url is not None else settings.WEBSITE_URL
                     try:
-                        oauth_client = Client.objects.get(is_enabled='Y', callback_url=redirect_url)
+                        oauth_client = Client.objects.get(is_enabled=True, callback_url=redirect_url)
                     except Client.DoesNotExist as e:
-                        oauth_client = Client.objects.get(is_enabled='Y', callback_url=settings.WEBSITE_URL)
+                        oauth_client = Client.objects.get(is_enabled=True, callback_url=settings.WEBSITE_URL)
                     grant_code = str(random_string())
 
                     Grant.objects.create(
@@ -43,7 +43,6 @@ def index(request):
                         client = oauth_client,
                         user = attemp_user,
                         ip_address = str(get_client_ip(request)),
-                        created_at = get_today_date(),
                         expired_at = add_minutes_from_now(settings.GRANT_MINUTES)
                     )
                     return HttpResponseRedirect(convert_url(oauth_client.callback_url, grant_code))

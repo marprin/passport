@@ -1,7 +1,8 @@
 from django.test import Client
+from django.utils import timezone
 import unittest
 from .models import User, OauthClient
-from passport.common.helper import encrypt_password, get_today_date
+from passport.common.helper import encrypt_password
 
 # Create your tests here.
 
@@ -22,9 +23,9 @@ class LoginTest(unittest.TestCase):
             name='tes',
             email='admin@gmail.com',
             password=encrypt_password(123456),
-            confirmed_account='Y',
-            created_at=get_today_date(),
-            updated_at=get_today_date()
+            confirmed_account=True,
+            created_at=timezone.now(),
+            updated_at=timezone.now()
         )
 
         self.oauth_client = OauthClient.objects.create(
@@ -32,9 +33,9 @@ class LoginTest(unittest.TestCase):
             client_public_key = 'aaa',
             client_secret_key = 'bbb',
             callback_url = 'http://aa.dev',
-            is_enabled='Y',
-            created_at = get_today_date(),
-            updated_at = get_today_date()
+            is_enabled=True,
+            created_at = timezone.now(),
+            updated_at = timezone.now()
         )
         response = self.client.post('/?redirect_url=http://aa.dev', {'email': self.user.email, 'password': 123456})
         self.assertEqual(response.status_code, 302)

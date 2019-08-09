@@ -44,8 +44,6 @@ class Index(APIView):
             refresh_token = random_string(),
             expired_at = add_days_from_today(20),
             revoked=True,
-            created_at = get_today_date(),
-            updated_at = get_today_date()
         )
 
         return Response({

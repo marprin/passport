@@ -3,7 +3,6 @@ from __future__ import unicode_literals
 from django.test import Client
 import unittest
 from passport.login.models import User, OauthClient, OauthGrant
-from passport.common.helper import get_today_date
 
 # Create your tests here.
 class OauthTest(unittest.TestCase):
@@ -35,8 +34,6 @@ class OauthTest(unittest.TestCase):
             client_secret_key = 'sa',
             callback_url = 'http://test.dev',
             is_enabled = 'Y',
-            created_at = get_today_date(),
-            updated_at = get_today_date()
         )
 
         response = self.client.post('/api/v1/oauth/', {
@@ -59,15 +56,11 @@ class OauthTest(unittest.TestCase):
             client_secret_key='saa',
             callback_url='http://test2.dev',
             is_enabled='Y',
-            created_at=get_today_date(),
-            updated_at=get_today_date()
         )
 
         self.user = User.objects.create(
             name = 'test',
             email = 'testing@gmail.com',
-            created_at = get_today_date(),
-            updated_at = get_today_date()
         )
 
         self.oauth_grant = OauthGrant.objects.create(
@@ -75,7 +68,6 @@ class OauthTest(unittest.TestCase):
             client = self.oauth_client,
             user = self.user,
             ip_address='127.0.0.1',
-            created_at = get_today_date(),
         )
 
         response = self.client.post('/api/v1/oauth/', {
