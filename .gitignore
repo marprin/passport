@@ -11,3 +11,4 @@ my.cnf
 .env
 /venv
 htmlcov
+/static
