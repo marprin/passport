@@ -1,20 +1,26 @@
-version: "2"
 version: '3'
 
 services:
-    app:
-        build:
-            context: .
-        # restart: always
-        volumes:
-            - ./:/app
-            - /staticfile:/staticfile
-        ports:
-            - "8800:8800"
-        env_file:
-            - .env
-        links:
-            - redis
+  app:
+    build:
+      context: .
+    volumes:
+      - ./:/app
+      - ./static_files:/app/static_files
+    ports:
+      - "8800:8800"
+    env_file:
+      - .env
+    links:
+      - redis
+      - postgres
 
-    redis:
-        image: redis:alpine
+  redis:
+    image: redis:alpine
+
+  postgres:
+    image: postgres:9-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: mysecretpass
+      POSTGRES_DB: passport
