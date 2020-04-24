@@ -24,3 +24,5 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: mysecretpass
       POSTGRES_DB: passport
+    ports:
+      - "5555:5432"

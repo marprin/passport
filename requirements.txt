@@ -1,13 +1,18 @@
-bcrypt==3.1.4
-Django==1.11.23
-djangorestframework==3.10.2
+bcrypt==3.1.7
+Django==2.2.7
+djangorestframework==3.10.3
 django-environ==0.4.5
 gevent==1.4.0
 gunicorn==19.9.0
-psycopg2==2.8.3
+psycopg2==2.8.4
 PyJWT==1.6.4
 requests==2.22.0
 
 # For test
 coverage==4.5.4
-Faker==2.0.0
+Faker==2.0.4
+
+# Lint
+black==19.10b0
+flake8==3.7.9
+flake8-bugbear==19.8.0

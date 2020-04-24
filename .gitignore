@@ -12,3 +12,4 @@ my.cnf
 /venv
 htmlcov
 /static
+/static_files
