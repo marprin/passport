@@ -16,8 +16,8 @@ class User(models.Model):
 
 
 class LoginEvent(models.Model):
-    user = models.ForeignKey('user.User')
-    client = models.ForeignKey('oauth.Client')
+    user = models.ForeignKey('user.User', on_delete=models.DO_NOTHING)
+    client = models.ForeignKey('oauth.Client', on_delete=models.DO_NOTHING)
     ip_address = models.CharField(max_length=50)
     platform = models.CharField(max_length=150)
     browser = models.CharField(max_length=100)
@@ -30,8 +30,8 @@ class LoginEvent(models.Model):
 
 
 class Device(models.Model):
-    user = models.ForeignKey('user.User')
-    client = models.ForeignKey('oauth.Client')
+    user = models.ForeignKey('user.User', on_delete=models.DO_NOTHING)
+    client = models.ForeignKey('oauth.Client', on_delete=models.DO_NOTHING)
     ip_address = models.CharField(max_length=50)
     platform = models.CharField(max_length=150)
     browser = models.CharField(max_length=100)

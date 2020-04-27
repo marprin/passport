@@ -1,7 +1,7 @@
 from django.db import models
 
 
-class Client(models.Models):
+class Client(models.Model):
     name = models.CharField(max_length=100, unique=True)
     public_key = models.CharField(max_length=100, unique=True)
     secret_key = models.CharField(max_length=100, unique=True)
@@ -15,7 +15,7 @@ class Client(models.Models):
 
 
 class IPAddress(models.Model):
-    client = models.ForeignKey('oauth.Client')
+    client = models.ForeignKey('oauth.Client', on_delete=models.DO_NOTHING)
     ip_address = models.CharField(max_length=50)
     revoked = models.BooleanField(max_length=1, default=False)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -27,8 +27,8 @@ class IPAddress(models.Model):
 
 class Grant(models.Model):
     code = models.CharField(max_length=100, unique=True)
-    client = models.ForeignKey('oauth.Client')
-    user = models.ForeignKey('user.User')
+    client = models.ForeignKey('oauth.Client', on_delete=models.DO_NOTHING)
+    user = models.ForeignKey('user.User', on_delete=models.DO_NOTHING)
     ip_address = models.CharField(max_length=50)
     revoked = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -40,8 +40,8 @@ class Grant(models.Model):
 
 class AccessToken(models.Model):
     access_token = models.CharField(max_length=150, unique=True)
-    user = models.ForeignKey('user.User')
-    client = models.ForeignKey('oauth.Client')
+    user = models.ForeignKey('user.User', on_delete=models.DO_NOTHING)
+    client = models.ForeignKey('oauth.Client', on_delete=models.DO_NOTHING)
     refresh_token = models.CharField(max_length=150, unique=True)
     expired_at = models.DateTimeField(null=True)
     is_refresh_token_used = models.BooleanField(max_length=1, default=False)
