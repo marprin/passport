@@ -80,7 +80,7 @@ WSGI_APPLICATION = 'sso.wsgi.application'
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
 
 DATABASES = {
-    'default': 'default': env.db() # Raises ImproperlyConfigured exception if DATABASE_URL not in os.environ
+    'default': env.db() # Raises ImproperlyConfigured exception if DATABASE_URL not in os.environ
 }
 DATABASES['default']['ATOMIC_REQUESTS'] = True
 
@@ -146,12 +146,5 @@ REST_FRAMEWORK = {
         'user': '60/minute'
     }
 }
-
-WEBSITE_URL = ''
-CMS_URL = ''
-
-if DEBUG:
-    WEBSITE_URL = ''
-    CMS_URL = ''
 
 GRANT_MINUTES = 5
