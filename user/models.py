@@ -5,7 +5,7 @@ class User(models.Model):
     name = models.CharField(max_length=100)
     email = models.CharField(max_length=100, unique=True)
     password = models.CharField(max_length=255)
-    phone = models.CharField(max_length=30, null=True)
+    phone = models.CharField(max_length=30, null=True, unique=True)
     pp_path = models.CharField(max_length=255, null=True)
     last_login = models.DateTimeField(null=True)
     created_at = models.DateTimeField(auto_now_add=True)
