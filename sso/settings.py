@@ -120,6 +120,22 @@ USE_L10N = True
 
 USE_TZ = True
 
+APPEND_SLASH = False
+
+SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
+CACHES = {
+    'default': {
+        'BACKEND': 'django_redis.cache.RedisCache',
+        'LOCATION': env('REDIS_DSN'),
+        'TIMEOUT': env('REDIS_TIMEOUT'),
+        'KEY_PREFIX': env('REDIS_PREFIX'),
+        'OPTIONS': {
+            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+            'server_max_value_length': env('REDIS_MAX_VALUE_LENGTH'),
+        }
+    }
+}
+
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
