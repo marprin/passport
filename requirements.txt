@@ -8,6 +8,7 @@ gunicorn==20.0.4
 hiredis==1.0.1
 psycopg2==2.8.5
 PyJWT==1.7.1
+redis==3.4.1
 requests==2.23.0
 
 # For test
