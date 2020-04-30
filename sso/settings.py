@@ -132,6 +132,7 @@ CACHES = {
         'OPTIONS': {
             'CLIENT_CLASS': 'django_redis.client.DefaultClient',
             'server_max_value_length': env('REDIS_MAX_VALUE_LENGTH'),
+            'password': env('REDIS_PASSWORD'),
         }
     }
 }
