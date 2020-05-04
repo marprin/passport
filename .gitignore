@@ -12,3 +12,5 @@ my.cnf
 /venv
 htmlcov
 /static
+.tox
+logs/*.log
