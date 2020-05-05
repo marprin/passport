@@ -1,7 +1,2 @@
-from django.urls import path
-
-
-app_name = 'user'
-urlpatterns = [
-    
-]
+app_name = "user"
+urlpatterns = []

@@ -2,10 +2,10 @@ from django.db import models
 
 
 class User(models.Model):
-    name = models.CharField(max_length=100)
-    email = models.CharField(max_length=100, unique=True)
+    name = models.CharField(max_length=255)
+    email = models.CharField(max_length=255, unique=True)
     password = models.CharField(max_length=255)
-    phone = models.CharField(max_length=30, null=True, unique=True)
+    phone = models.CharField(max_length=255, null=True, unique=True)
     pp_path = models.CharField(max_length=255, null=True)
     last_login = models.DateTimeField(null=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -14,10 +14,16 @@ class User(models.Model):
     def __str__(self):
         return self.name
 
+    class Meta:
+        indexes = [
+            models.Index(fields=["email"]),
+            models.Index(fields=["phone"]),
+        ]
+
 
 class LoginEvent(models.Model):
-    user = models.ForeignKey('user.User', on_delete=models.DO_NOTHING)
-    client = models.ForeignKey('oauth.Client', on_delete=models.DO_NOTHING)
+    user = models.ForeignKey("user.User", on_delete=models.DO_NOTHING)
+    client = models.ForeignKey("oauth.Client", on_delete=models.DO_NOTHING)
     ip_address = models.CharField(max_length=50)
     platform = models.CharField(max_length=150)
     browser = models.CharField(max_length=100)
@@ -30,8 +36,9 @@ class LoginEvent(models.Model):
 
 
 class Device(models.Model):
-    user = models.ForeignKey('user.User', on_delete=models.DO_NOTHING)
-    client = models.ForeignKey('oauth.Client', on_delete=models.DO_NOTHING)
+    user = models.ForeignKey("user.User", on_delete=models.DO_NOTHING)
+    client = models.ForeignKey("oauth.Client", on_delete=models.DO_NOTHING)
+    identifier = models.CharField(max_length=255, unique=True)
     ip_address = models.CharField(max_length=50)
     platform = models.CharField(max_length=150)
     browser = models.CharField(max_length=100)
