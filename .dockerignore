@@ -1,0 +1,16 @@
+.git/
+.DS_Store
+*.pyc
+*.sqlite3
+*.sqlite
+*.pyo
+*.so
+.tox/
+.idea/
+.coverage
+venv/
+.vscode/
+htmlcov/
+my.cnf
+.env
+logs/.*log
