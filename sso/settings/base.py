@@ -14,7 +14,7 @@ import os
 import environ
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 env = environ.Env(Debug=(bool, False),)
 
 if os.path.exists(os.path.join(BASE_DIR, ".env")):
@@ -129,7 +129,7 @@ CACHES = {
         },
     }
 }
-
+MESSAGE_STORAGE = "django.contrib.messages.storage.fallback.FallbackStorage"
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
@@ -157,43 +157,43 @@ REST_FRAMEWORK = {
 
 GRANT_MINUTES = 5
 
-LOGGING = {
-    "version": 1,
-    "disable_existing_loggers": False,
-    "formatters": {
-        "default": {
-            "format": "%(asctime)s - %(process)s - %(name)s - %(levelname)s - %(message)s"
-        },
-        "json_formatter": {
-            "class": "pythonjsonlogger.jsonlogger.JsonFormatter",
-            "format": "%(asctime)s %(process)d %(threadName)s "
-            "%(name)s %(levelname)s %(pathname)s %(lineno)s %(message)s",
-            "datefmt": "%Y-%m-%dT%H:%M:%S%z",
-        },
-    },
-    "handlers": {
-        "console": {
-            "class": "logging.StreamHandler",
-            "level": "ERROR",
-            "formatter": "json_formatter",
-            "stream": "ext://sys.stdout",
-        },
-        "file_handler": {
-            "class": "logging.handlers.RotatingFileHandler",
-            "level": "DEBUG",
-            "formatter": "default",
-            "filename": os.path.join(BASE_DIR, "logs/debug.log"),
-            "maxBytes": 10485760,
-            "backupCount": 5,
-            "encoding": "utf8",
-        },
-    },
-    "loggers": {
-        "django": {
-            "level": "DEBUG",
-            "propagate": False,
-            "handlers": ["file_handler", "console"],
-        }
-    },
-    "root": {"level": "ERROR", "handlers": ["console"], "propagate": False,},
-}
+# LOGGING = {
+#     "version": 1,
+#     "disable_existing_loggers": False,
+#     "formatters": {
+#         "default": {
+#             "format": "%(asctime)s - %(process)s - %(name)s - %(levelname)s - %(message)s"
+#         },
+#         "json_formatter": {
+#             "class": "pythonjsonlogger.jsonlogger.JsonFormatter",
+#             "format": "%(asctime)s %(process)d %(threadName)s "
+#             "%(name)s %(levelname)s %(pathname)s %(lineno)s %(message)s",
+#             "datefmt": "%Y-%m-%dT%H:%M:%S%z",
+#         },
+#     },
+#     "handlers": {
+#         "console": {
+#             "class": "logging.StreamHandler",
+#             "level": "ERROR",
+#             "formatter": "json_formatter",
+#             "stream": "ext://sys.stdout",
+#         },
+#         "file_handler": {
+#             "class": "logging.handlers.RotatingFileHandler",
+#             "level": "DEBUG",
+#             "formatter": "default",
+#             "filename": os.path.join(BASE_DIR, "logs/debug.log"),
+#             "maxBytes": 10485760,
+#             "backupCount": 5,
+#             "encoding": "utf8",
+#         },
+#     },
+#     "loggers": {
+#         "django": {
+#             "level": "DEBUG",
+#             "propagate": False,
+#             "handlers": ["file_handler", "console"],
+#         }
+#     },
+#     "root": {"level": "ERROR", "handlers": ["console"], "propagate": False,},
+# }

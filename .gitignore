@@ -13,4 +13,4 @@ my.cnf
 htmlcov
 /static
 .tox
-logs/*.log
+logs/*.log*
