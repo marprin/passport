@@ -116,6 +116,7 @@ USE_TZ = True
 APPEND_SLASH = False
 
 SESSION_ENGINE = "django.contrib.sessions.backends.cache"
+SESSION_COOKIE_HTTPONLY = True
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",

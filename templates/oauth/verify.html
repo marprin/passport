@@ -1,0 +1,47 @@
+{% extends 'layout/master.html' %}
+{% load staticfiles %}
+
+{% block content %}
+
+<div class="row mt-5">
+    <div class="col-lg-6 offset-lg-3 col-md-8 offset-md-2 col-sm-10 offset-sm-1 col-xs-12">
+        <div class="card">
+            <div class="card-header card-danger text-center">
+                <h4 class="text-white pt-2"><strong>Login</strong></h4>
+            </div>
+            <div class="card-block card-info">
+                <form action="{% url 'oauth:index' %}" method="POST">
+                    {% csrf_token %}
+                    <input type="hidden" name="redirect_url" value="{{ redirect_url }}">
+                    <div class="form-group">
+                        <label for="emailInput"><strong>Email</strong></label>
+                        <input type="text" class="form-control" name="email" id="emailInput" placeholder="Input your email" value="{{ email }}">
+                        {% if errors and errors.email %}
+                            <small class="text-muted form-text text-danger"><strong>{{ errors.email }}</strong></small>
+                        {% endif %}
+                    </div>
+                    <div class="form-group">
+                        <label for="passwordInput"><strong>Password</strong></label>
+                        <input type="password" class="form-control" name="password" id="passwordInput" placeholder="Input your password">
+                        {% if errors and errors.password %}
+                            <small class="text-muted form-text text-danger"><strong>{{ errors.password }}</strong></small>
+                        {% endif %}
+                    </div>
+                    <div class="form-group">
+                        {% if errors and errors.general_errors %}
+                            <small class="text-muted form-text text-danger"><strong>{{ errors.general_errors }}</strong></small>
+                        {% endif %}
+                        <button type="submit" class="btn btn-danger col-lg-12"><strong>Sign in</strong></button>
+                    </div>
+                </form>
+            </div>
+            <div class="card-footer card-danger text-center text-white">
+                <strong>
+                    {% now "Y" %}
+                </strong>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

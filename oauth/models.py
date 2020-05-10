@@ -4,9 +4,8 @@ from django.utils import timezone
 
 class Client(models.Model):
     name = models.CharField(max_length=255, unique=True)
-    public_key = models.CharField(max_length=255, unique=True)
+    client_key = models.CharField(max_length=255, unique=True)
     secret_key = models.CharField(max_length=255, unique=True)
-    callback_url = models.CharField(max_length=255)
     active = models.BooleanField(max_length=1, default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -16,7 +15,7 @@ class Client(models.Model):
 
     class Meta:
         indexes = [
-            models.Index(fields=["public_key", "active"]),
+            models.Index(fields=["client_key", "active"]),
             models.Index(fields=["secret_key", "active"]),
         ]
 
