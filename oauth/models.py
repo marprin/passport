@@ -79,6 +79,9 @@ class AccessToken(models.Model):
     def __str__(self):
         return self.access_token
 
+    def find_by_access_token(access_token):
+        return AccessToken.objects.filter(access_token=access_token)
+
     def find_valid_token_by_access_token(access_token):
         return (
             AccessToken.objects.filter(access_token=access_token)
