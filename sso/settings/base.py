@@ -26,10 +26,10 @@ if os.path.exists(os.path.join(BASE_DIR, ".env")):
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = "#0se1-r*)6o)kz1b6dix(u4@%0-km7k^m*8zm_&l6*7u%7q@*g"
-SECRET_KEY = env("SECRET_KEY")
+SECRET_KEY = env.str("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = env("DEBUG")
+DEBUG = env.bool("DEBUG")
 
 ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=["*"])
 
@@ -120,13 +120,16 @@ SESSION_COOKIE_HTTPONLY = True
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": env("REDIS_DSN"),
-        "TIMEOUT": env("REDIS_TIMEOUT"),
-        "KEY_PREFIX": env("REDIS_PREFIX"),
+        "LOCATION": env.str("REDIS_DSN"),
+        "TIMEOUT": env.int("REDIS_TIMEOUT"),
+        "KEY_PREFIX": env.str("REDIS_PREFIX"),
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
-            "server_max_value_length": env("REDIS_MAX_VALUE_LENGTH"),
-            "password": env("REDIS_PASSWORD"),
+            "PARSER_CLASS": "redis.connection.HiredisParser",
+            "SOCKET_CONNECT_TIMEOUT": env.int("REDIS_SOCKET_CONNECT_TIMEOUT"),
+            "SOCKET_TIMEOUT": env.int("REDIS_SOCKET_TIMEOUT"),
+            "server_max_value_length": env.int("REDIS_MAX_VALUE_LENGTH"),
+            "PASSWORD": env.str("REDIS_PASSWORD"),
         },
     }
 }

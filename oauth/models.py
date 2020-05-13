@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils import timezone
+from datetime import timedelta
 
 
 class Client(models.Model):
@@ -12,6 +13,9 @@ class Client(models.Model):
 
     def __str__(self):
         return self.name
+
+    def find_active_client(client_key):
+        return Client.objects.get(client_key=client_key, active=True)
 
     class Meta:
         indexes = [
@@ -43,19 +47,16 @@ class Grant(models.Model):
     code = models.CharField(max_length=255, unique=True)
     client = models.ForeignKey("oauth.Client", on_delete=models.DO_NOTHING)
     user = models.ForeignKey("user.User", on_delete=models.DO_NOTHING)
-    ip_address = models.CharField(max_length=50)
     revoked = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
-    expired_at = models.DateTimeField(null=True)
+    expired_at = models.DateTimeField(default=(timezone.now() + timedelta(minutes=5)))
 
     def __str__(self):
         return self.code
 
-    def get_user_on_grant_code(self, code, client):
-        now = timezone.now()
-
-        return self.objects.filter(
-            code=code, client=client, revoked=False, expired_at__lte=now
+    def get_user_by_valid_grant_code(code, client):
+        return Grant.objects.filter(
+            code=code, client=client, revoked=False, expired_at__lte=timezone.now()
         ).first()
 
     class Meta:
@@ -76,7 +77,15 @@ class AccessToken(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return self.name
+        return self.access_token
+
+    def find_valid_token_by_access_token(access_token):
+        return (
+            AccessToken.objects.filter(access_token=access_token)
+            .filter(revoked=False)
+            .filter(expired_at__gte=timezone.now())
+            .first()
+        )
 
 
 class Verification(models.Model):
@@ -92,10 +101,10 @@ class Verification(models.Model):
     def __str__(self):
         return self.reference_number
 
-    def get_user_on_verification(self, reference_number, otp, client):
+    def get_user_on_verification(reference_number, otp, client):
         now = timezone.now()
 
-        return self.objects.filter(
+        return Verification.objects.filter(
             reference_number=reference_number,
             otp=otp,
             client=client,
