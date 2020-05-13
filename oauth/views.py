@@ -59,7 +59,6 @@ class OauthLoginView(View):
                 redirect_to = structure_response_url(
                     decoded_sso, grant.code, client.secret_key
                 )
-                print(redirect_to)
                 return HttpResponseRedirect(redirect_to)
             except ValueError as e:
                 logger.error(f"Error on check access token: {str(e)}")
