@@ -15,8 +15,12 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from healthz.views import healthz
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('oauth/', include('oauth.urls'))
+    path("admin/", admin.site.urls),
+    path("oauth/", include("oauth.urls")),
+    path("healthz", healthz),
+    # This will expose /metrics as already included in the prometheus lib
+    path("monitoring/", include("django_prometheus.urls")),
 ]
