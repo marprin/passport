@@ -4,6 +4,8 @@ services:
   app:
     build:
       context: .
+      dockerfile: ./Dockerfile
+    image: sso:latest
     volumes:
       - ./:/app
       - ./static_files:/app/static_files
@@ -33,6 +35,54 @@ services:
       POSTGRES_DB: passport
     ports:
       - "5555:5432"
+    networks:
+      - passport-service-networks
+
+  celerybeat:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    image: sso:latest
+    working_dir: /app
+    volumes:
+      - ./:/app
+    env_file:
+      - .env.example
+    depends_on:
+      - redis
+      - postgres
+    entrypoint: celery beat -A sso.celery -l info
+    networks:
+      - passport-service-networks
+
+  flower:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    image: sso:latest
+    working_dir: /app
+    volumes:
+      - ./:/app
+    ports:
+      - "5555:5555"
+    entrypoint: celery flower -A sso.celery -l info --address=0.0.0.0 --port=5555
+    networks:
+      - passport-service-networks
+
+  worker:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    image: sso:latest
+    working_dir: /app
+    volumes:
+      - ./:/app
+    env_file:
+      - .env.example
+    depends_on:
+      - celerybeat
+      - redis
+    entrypoint: celery worker -A sso.celery -l info
     networks:
       - passport-service-networks
 

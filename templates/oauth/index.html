@@ -12,7 +12,6 @@
             <div class="card-block card-info">
                 <form action="{% url 'oauth:index' %}" method="POST">
                     {% csrf_token %}
-                    <input type="hidden" name="redirect_url" value="{{ redirect_url }}">
                     <div class="form-group">
                         <label for="emailInput"><strong>Email</strong></label>
                         <input type="text" class="form-control" name="email" id="emailInput" placeholder="Input your email" value="{{ email }}">

@@ -38,12 +38,12 @@ If you change JavaScript file(s), you have to update the js by running this comm
 
 1. Setup using Docker
 
-- get inside the docker container by `docker exec -ti <container name> bash`
-- run `python manage.py collectstatic`
+-   get inside the docker container by `docker exec -ti <container name> bash`
+-   run `python manage.py collectstatic`
 
 2. Setup using virtualenv
 
-- run `python manage.py collectstatic`
+-   run `python manage.py collectstatic`
 
 ## To Run a test
 
@@ -64,3 +64,6 @@ If you want to check code coverage just run
 and then to see the report just run
 
     `coverage report`
+
+sso = data -> convert to json -> base64
+sig = data -> convert to json -> + secret -> sha512

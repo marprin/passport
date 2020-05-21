@@ -16,7 +16,7 @@ from common.constants import (
     RedirectionNotPresent,
 )
 from .forms import LoginForm
-from .models import AccessToken
+from .models import AccessToken, Verification
 from .services import (
     validate_client,
     generate_grant_token_from_access_token,
@@ -39,7 +39,7 @@ class OauthLoginView(View):
         if sig is None or sso is None:
             referer = request.META.get("HTTP_REFERER", None)
             if referer is None:
-                return HttpResponseNotFound(SignatureOrSSONotPresent)
+                return HttpResponseBadRequest(SignatureOrSSONotPresent)
             return HttpResponseRedirect(referer)
 
         sig = unquote(sig)
@@ -80,7 +80,7 @@ class OauthLoginView(View):
             try:
                 err = json.loads(message)
             except (ValueError, TypeError) as e:
-                context["errors"]["general_errors"] = GeneralError
+                context["errors"]["general_errors"].append(GeneralError)
                 logger.error(
                     f"Error in parsing payload of error message login: {str(e)}"
                 )
@@ -101,10 +101,26 @@ class OauthLoginView(View):
 
         email = form.cleaned_data["email"]
         password = form.cleaned_data["password"]
+        sig = request.session["sig"]
+        sso = request.session["sso"]
 
-        print(email, password)
+        # Validate sig and sso
 
-        return HttpResponse("Success")
+        try:
+            client, dict_sso = validate_client(sig, sso)
+        except Exception as e:
+            logger.error(f"Error in validate sig and sso: {str(e)}")
+
+        # try:
+        #     reference = login(email, password, sso)
+        # except Exception as e:
+        #     logger.error(f"Error: {str(e)}")
+        #     HttpResponseRedirect(reverse("oauth:index"))
+
+        return HttpResponseRedirect(
+            reverse("oauth:verify", args=["jfaksejfkasejfkasejf-fasekfaskef"])
+        )
+        return HttpResponseRedirect(reverse("oauth:verify", args=[reference]))
 
 
 class LogoutView(View):
@@ -128,8 +144,18 @@ class LogoutView(View):
 
 class VerificationView(View):
     def get(self, request, *args, **kwargs):
-        context = {}
+        reference = kwargs["reference"]
+
+        context = {"data": {"reference": reference}}
         return render(request, "oauth/verify.html", context=context)
+
+    def post(self, request, *args, **kwargs):
+        pass
+
+
+class ReOTP(View):
+    def get(self, request, *args, **kwargs):
+        pass
 
     def post(self, request, *args, **kwargs):
         pass

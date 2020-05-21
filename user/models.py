@@ -1,4 +1,5 @@
 from django.db import models
+from django.conf import settings
 
 
 class User(models.Model):
@@ -6,6 +7,8 @@ class User(models.Model):
     email = models.CharField(max_length=255, unique=True)
     password = models.CharField(max_length=255)
     phone = models.CharField(max_length=255, null=True, unique=True)
+    revoked = models.BooleanField(default=False)
+    failed_login_attempt = models.SmallIntegerField(default=0)
     pp_path = models.CharField(max_length=255, null=True)
     last_login = models.DateTimeField(null=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -14,15 +17,20 @@ class User(models.Model):
     def __str__(self):
         return self.name
 
+    def get_non_blocked_user(email):
+        return (
+            User.objects.filter(email=email)
+            .filter(revoked=False)
+            .filter(failed_login_attempt__lte=settings.MAX_FAILED_LOGIN_ATTEMPT)
+            .first()
+        )
+
     class Meta:
-        indexes = [
-            models.Index(fields=["email"]),
-            models.Index(fields=["phone"]),
-        ]
+        indexes = [models.Index(fields=["email", "revoked", "failed_login_attempt"])]
 
 
 class LoginEvent(models.Model):
-    user = models.ForeignKey("user.User", on_delete=models.DO_NOTHING)
+    email = models.CharField(max_length=255)
     client = models.ForeignKey("oauth.Client", on_delete=models.DO_NOTHING)
     ip_address = models.CharField(max_length=50)
     platform = models.CharField(max_length=150)
