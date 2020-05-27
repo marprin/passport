@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Client, IPAddress, Grant, AccessToken
+from oauth.models import Client, IPAddress, Grant, AccessToken
 
 
 # Register your models here.

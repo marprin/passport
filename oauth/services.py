@@ -1,4 +1,4 @@
-from .models import Grant, Client, AccessToken
+from oauth.models import Grant, Client, AccessToken
 from common.constants import (
     UserNotFound,
     InvalidPayload,
@@ -18,7 +18,7 @@ import hashlib
 import requests
 
 
-def login(email: str, password: str, sso: str):
+def check_user(email: str, password: str):
     try:
         user = User.objects.get(email=email)
     except User.DoesNotExist:

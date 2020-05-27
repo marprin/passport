@@ -8,6 +8,7 @@ class User(models.Model):
     password = models.CharField(max_length=255)
     phone = models.CharField(max_length=255, null=True, unique=True)
     revoked = models.BooleanField(default=False)
+    otp_email_enabled = models.BooleanField(default=False)
     failed_login_attempt = models.SmallIntegerField(default=0)
     pp_path = models.CharField(max_length=255, null=True)
     last_login = models.DateTimeField(null=True)
