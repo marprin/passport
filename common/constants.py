@@ -9,3 +9,4 @@ SignatureOrSSONotPresent = (
 )
 GeneralError = "Please try again in a moment"
 RedirectionNotPresent = "Redirection URL not present"
+EmailorPasswordNotValid = "Email or Password is not found or valid"

@@ -26,12 +26,12 @@ def check_user(email: str, password: str):
 
     is_pwd_valid = validate_password(user.password, password)
     if is_pwd_valid is False:
-        LoginEvent.objects.create()
         raise ValueError(UserNotFound)
+    return user
 
 
 def validate_password(hash_password: str, password: str) -> bool:
-    if bcrypt.checkpw(password, hashed_password):
+    if bcrypt.checkpw(password.encode("utf-8"), hash_password.encode("utf-8")):
         return True
     return False
 
@@ -86,3 +86,7 @@ def generate_grant_token_from_access_token(access_token: str, client: Client) ->
         raise ValueError(AccessTokenNotFound)
 
     return Grant.objects.create(code=str(uuid4()), client=client, user=ac_tkn.user)
+
+
+def get_active_client(client_key):
+    return Client.find_active_client(client_key=client_key)

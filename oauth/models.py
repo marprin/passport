@@ -114,7 +114,7 @@ class AccessToken(models.Model):
 
 class Verification(models.Model):
     reference = models.CharField(max_length=255, unique=True)
-    otp_reference = models.CharField(max_length=255)
+    otp_reference = models.CharField(max_length=255, null=True)
     user = models.ForeignKey("user.User", on_delete=models.DO_NOTHING)
     client = models.ForeignKey("oauth.Client", on_delete=models.DO_NOTHING)
     revoked = models.BooleanField(default=False)

@@ -9,3 +9,13 @@ def merge_url_with_new_query_string(url: str, new_params: dict) -> str:
     update_query = urlencode(merged_params, doseq=True)
 
     return url_components._replace(query=update_query).geturl()
+
+
+def get_client_ip(request):
+    x_forwarded_for = request.META.get("HTTP_X_FORWARDED_FOR")
+
+    if x_forwarded_for:
+        ip = x_forwarded_for.split(",")[-1]
+    else:
+        ip = request.META.get("REMOTE_ADDR")
+    return ip
