@@ -5,7 +5,6 @@ from common.constants import (
     MissingClientKey,
     ClientNotFound,
     SignatureNotValid,
-    AccessTokenNotFound,
 )
 from user.models import User, LoginEvent
 from common.utils import merge_url_with_new_query_string
@@ -80,12 +79,12 @@ def validate_client(sig: str, sso: str) -> (Client, dict):
     return client, dict_sso
 
 
-def generate_grant_token_from_access_token(access_token: str, client: Client) -> Grant:
-    ac_tkn = AccessToken.find_valid_token_by_access_token(access_token)
-    if not ac_tkn:
-        raise ValueError(AccessTokenNotFound)
+def generate_grant_token_from_user_id(id: int, client: Client) -> Grant:
+    user = User.get_non_blocked_by_id(pk=id)
+    if not user:
+        raise ValueError(UserNotFound)
 
-    return Grant.objects.create(code=str(uuid4()), client=client, user=ac_tkn.user)
+    return Grant.objects.create_grant(code=str(uuid4()), client=client, user=user)
 
 
 def get_active_client(client_key):

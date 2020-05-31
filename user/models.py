@@ -2,6 +2,14 @@ from django.db import models
 from django.conf import settings
 
 
+class UserManager(models.Manager):
+    def active(self):
+        return self.filter(revoked=False)
+
+    def not_reach_max_attempt(self):
+        return self.filter(failed_login_attempt__lte=settings.MAX_FAILED_LOGIN_ATTEMPT)
+
+
 class User(models.Model):
     name = models.CharField(max_length=255)
     email = models.CharField(max_length=255, unique=True)
@@ -15,16 +23,16 @@ class User(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    objects = UserManager()
+
     def __str__(self):
         return self.name
 
+    def get_non_blocked_by_id(pk):
+        return User.objects.active().not_reach_max_attempt().filter(pk=pk).first()
+
     def get_non_blocked_user(email):
-        return (
-            User.objects.filter(email=email)
-            .filter(revoked=False)
-            .filter(failed_login_attempt__lte=settings.MAX_FAILED_LOGIN_ATTEMPT)
-            .first()
-        )
+        return User.objects.filter(email=email).active().not_reach_max_attempt().first()
 
     class Meta:
         indexes = [models.Index(fields=["email", "revoked", "failed_login_attempt"])]

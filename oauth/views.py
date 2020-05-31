@@ -7,6 +7,7 @@ from django.views.generic import View
 from django.contrib import messages
 from django.contrib.messages import get_messages
 from django.urls import reverse
+from django.core import signing
 from common.constants import (
     GeneralError,
     RedirectionNotPresent,
@@ -25,7 +26,6 @@ from user.models import LoginEvent
 from uuid import uuid4
 import json
 import logging
-import sys
 
 
 logger = logging.getLogger(__name__)
@@ -74,15 +74,16 @@ class OauthLoginView(View):
             return HttpResponseRedirect(reverse("oauth:index"))
 
         if user.otp_email_enabled:
-            # Handle the OTP request and redirect to verify page
+            # TODO: Handle the OTP request and redirect to verify page
             return HttpResponseRedirect(reverse("oauth:verify"))
 
         # Create the grant
-        grant = Grant.objects.create(code=str(uuid4()), client=client, user=user,)
+        grant = Grant.objects.create_grant(code=str(uuid4()), client=client, user=user,)
         redirect_url = structure_response_url(
             decoded_sso, grant.code, client.secret_key
         )
         request.session["decoded_sso"] = None
+        request.session["user_id"] = signing.dumps(user.id)
         return HttpResponseRedirect(redirect_url)
 
 
@@ -92,13 +93,9 @@ class LogoutView(View):
         if redirect_url is None:
             return HttpResponseBadRequest(RedirectionNotPresent)
 
-        acc_token = request.session["access_token"]
-        # Need to revoke the token
-        AccessToken.find_by_access_token(acc_token).update(revoked=True)
-
-        # Remove session token
+        # Remove user_id
         try:
-            del request.session["access_token"]
+            del request.session["user_id"]
         except KeyError:
             pass
 

@@ -4,9 +4,10 @@ from django.conf import settings
 from importlib import import_module
 from oauth.services import (
     validate_client,
-    generate_grant_token_from_access_token,
+    generate_grant_token_from_user_id,
     structure_response_url,
 )
+from django.core import signing
 from django.http import (
     HttpResponseBadRequest,
     HttpResponseRedirect,
@@ -51,12 +52,13 @@ class OauthSignatureMiddleware:
                 except Exception as e:
                     return HttpResponseBadRequest(str(e))
 
-            # If the session for access token is set, no need to login anymore
-            access_token = request.session.get("access_token", None)
-            if access_token is not None:
+            # If the session for user_id is set, no need to login anymore
+            dec_user_id = request.session.get("user_id", None)
+            if dec_user_id is not None:
                 # We have the data so only need to return the grant token
                 try:
-                    grant = generate_grant_token_from_access_token(access_token, client)
+                    user_id = signing.loads(user_id)
+                    grant = generate_grant_token_from_user_id(user_id, client)
                     redirect_to = structure_response_url(
                         decoded_sso, grant.code, client.secret_key
                     )
@@ -64,11 +66,11 @@ class OauthSignatureMiddleware:
                     request.session["decoded_sso"] = None
                     return HttpResponseRedirect(redirect_to)
                 except ValueError as e:
-                    logger.error(f"Error on check access token: {str(e)}")
-                    request.session["access_token"] = None
+                    logger.error(f"Error on get user: {str(e)}")
+                    request.session["user_id"] = None
                 except Exception as e:
                     logger.error(
-                        f"Error while session for access token still exists: {str(e)}"
+                        f"Error while session for user_id still exists: {str(e)}"
                     )
                 return HttpResponseServerError(GeneralError)
 
