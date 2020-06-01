@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     "user",
     "healthz",
     "django_prometheus",
+    "django_user_agents",
 ]
 
 MIDDLEWARE = [
@@ -58,6 +59,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "django_user_agents.middleware.UserAgentMiddleware",
     "sso.middleware.OauthSignatureMiddleware",
     "django_prometheus.middleware.PrometheusAfterMiddleware",
 ]
@@ -226,3 +228,5 @@ CELERY_TASK_SERIALIZER = "json"
 CELERY_RESULT_SERIALIZER = "json"
 CELERY_TIMEZONE = TIME_ZONE
 CELERY_TASK_PROTOCOL = 1
+
+USER_AGENTS_CACHE = "default"

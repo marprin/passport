@@ -4,6 +4,11 @@ from datetime import timedelta
 from django.conf import settings
 
 
+class ClientQuerySet(models.query.QuerySet):
+    def active(self):
+        return self.filter(revoked=False)
+
+
 class Client(models.Model):
     name = models.CharField(max_length=255, unique=True)
     client_key = models.CharField(max_length=255, unique=True)
@@ -12,11 +17,10 @@ class Client(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    objects = ClientQuerySet.as_manager()
+
     def __str__(self):
         return self.name
-
-    def find_active_client(client_key):
-        return Client.objects.get(client_key=client_key, revoked=False)
 
     class Meta:
         indexes = [
@@ -46,10 +50,10 @@ class IPAddress(models.Model):
         unique_together = [["ip_address", "client"]]
 
 
-class GrantManager(models.Manager):
+class GrantQuerySet(models.query.QuerySet):
     def create_grant(self, *args, **kwargs):
         kwargs["expired_at"] = timezone.now() + timedelta(
-            minutes=settings.GRANT_MINUTES
+            minutes=settings.GRANT_MINUTES_EXPIRED_MINUTES
         )
         return self.create(**kwargs)
 
@@ -69,19 +73,10 @@ class Grant(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     expired_at = models.DateTimeField()
 
-    objects = GrantManager()
+    objects = GrantQuerySet.as_manager()
 
     def __str__(self):
         return self.code
-
-    def get_user_by_valid_grant_code(code, client):
-        return (
-            Grant.objects.filter(code=code)
-            .filter(client=client)
-            .active()
-            .not_expired()
-            .first()
-        )
 
     class Meta:
         indexes = [
@@ -91,7 +86,7 @@ class Grant(models.Model):
         unique_together = [["code", "client"]]
 
 
-class AccessTokenManager(models.Manager):
+class AccessTokenQuerySet(models.query.QuerySet):
     def create_token(self, *args, **kwargs):
         kwargs["access_token_expired_at"] = timezone.now() + timedelta(
             days=settings.ACCESS_TOKEN_EXPIRED_DAYS
@@ -109,6 +104,9 @@ class AccessTokenManager(models.Manager):
     def not_expired_token(self):
         return self.filter(access_token_expired_at__gte=timezone.now())
 
+    def valid_access_token(self):
+        return self.active_access_token().not_expired_token()
+
 
 class AccessToken(models.Model):
     access_token = models.CharField(max_length=255, unique=True)
@@ -122,21 +120,10 @@ class AccessToken(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
-    objects = AccessTokenManager()
+    objects = AccessTokenQuerySet.as_manager()
 
     def __str__(self):
         return self.access_token
-
-    def find_by_access_token(access_token):
-        return AccessToken.objects.filter(access_token=access_token)
-
-    def find_valid_token_by_access_token(access_token):
-        return (
-            AccessToken.objects.filter(access_token=access_token)
-            .active_access_token()
-            .not_expired_token()
-            .first()
-        )
 
     class Meta:
         indexes = [
@@ -150,7 +137,7 @@ class AccessToken(models.Model):
         ]
 
 
-class VerificationManager(models.Manager):
+class VerificationQuerySet(models.query.QuerySet):
     def create_verification(self, *args, **kwargs):
         kwargs["expired_at"] = timezone.now() + timedelta(
             minutes=settings.VERIFICATION_EXPIRED_MINUTES
@@ -164,6 +151,9 @@ class VerificationManager(models.Manager):
     def not_expired(self):
         return self.filter(expired_at__gte=timezone.now())
 
+    def valid(self):
+        return self.active().not_expired()
+
 
 class Verification(models.Model):
     reference = models.CharField(max_length=255, unique=True)
@@ -175,18 +165,10 @@ class Verification(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
-    objects = VerificationManager()
+    objects = VerificationQuerySet.as_manager()
 
     def __str__(self):
         return self.reference
-
-    def get_valid_verification(reference, otp, client):
-        return (
-            Verification.objects.filter(reference=reference)
-            .active()
-            .not_expired()
-            .first()
-        )
 
     class Meta:
         indexes = [

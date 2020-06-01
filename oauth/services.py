@@ -67,7 +67,7 @@ def validate_client(sig: str, sso: str) -> (Client, dict):
         raise KeyError(MissingClientKey)
 
     try:
-        client = Client.find_active_client(client_key=client_key)
+        client = Client.objects.active().filter(client_key=client_key).get()
     except Client.DoesNotExist:
         raise Client.DoesNotExist(ClientNotFound)
 
@@ -80,12 +80,9 @@ def validate_client(sig: str, sso: str) -> (Client, dict):
 
 
 def generate_grant_token_from_user_id(id: int, client: Client) -> Grant:
-    user = User.get_non_blocked_by_id(pk=id)
-    if not user:
+    try:
+        user = User.objects.non_blocked_user().filter(pk=id).get()
+    except User.DoesNotExist:
         raise ValueError(UserNotFound)
 
     return Grant.objects.create_grant(code=str(uuid4()), client=client, user=user)
-
-
-def get_active_client(client_key):
-    return Client.find_active_client(client_key=client_key)

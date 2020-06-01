@@ -16,11 +16,10 @@ from common.constants import (
 )
 from common.utils import get_client_ip
 from oauth.forms import LoginForm
-from oauth.models import AccessToken, Verification, Grant
+from oauth.models import AccessToken, Verification, Grant, Client
 from oauth.services import (
     structure_response_url,
     check_user,
-    get_active_client,
 )
 from user.models import LoginEvent
 from uuid import uuid4
@@ -54,7 +53,11 @@ class OauthLoginView(View):
         decoded_sso = request.session["decoded_sso"]
 
         try:
-            client = get_active_client(decoded_sso["client_key"])
+            client = (
+                Client.objects.active()
+                .filter(client_key=decoded_sso["client_key"])
+                .get()
+            )
         except Client.DoesNotExist as e:
             logger.error(f"Client not found: {str(e)}")
             messages.error(request, [ClientNotFound], extra_tags="general_errors")
@@ -68,6 +71,12 @@ class OauthLoginView(View):
                 email=email,
                 client=client,
                 ip_address=get_client_ip(request),
+                platform=request.user_agent.os.family,
+                platform_version=request.user_agent.os.version_string,
+                browser=request.user_agent.browser.family,
+                browser_version=request.user_agent.browser.version_string,
+                device=request.user_agent.device.brand,
+                device_version=request.user_agent.device.model,
                 action=f"{str(e)}",
             )
             messages.error(request, EmailorPasswordNotValid, extra_tags="email")

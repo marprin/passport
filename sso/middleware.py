@@ -9,6 +9,7 @@ from oauth.services import (
 )
 from django.core import signing
 from django.http import (
+    HttpResponseNotFound,
     HttpResponseBadRequest,
     HttpResponseRedirect,
     HttpResponseServerError,
@@ -39,10 +40,14 @@ class OauthSignatureMiddleware:
                     return HttpResponseBadRequest(SignatureOrSSONotPresent)
                 else:
                     try:
-                        client = Client.find_active_client(decoded_sso["client_key"])
+                        client = (
+                            Client.objects.active()
+                            .filter(client_key=decoded_sso["client_key"])
+                            .get()
+                        )
                     except Client.DoesNotExist as e:
                         logger.error(f"Error on get client: {str(e)}")
-                        return HttpResponseBadRequest(ClientNotFound)
+                        return HttpResponseNotFound(ClientNotFound)
             else:
                 sig = unquote(sig)
                 sso = unquote(sso)
@@ -57,7 +62,7 @@ class OauthSignatureMiddleware:
             if dec_user_id is not None:
                 # We have the data so only need to return the grant token
                 try:
-                    user_id = signing.loads(user_id)
+                    user_id = signing.loads(dec_user_id)
                     grant = generate_grant_token_from_user_id(user_id, client)
                     redirect_to = structure_response_url(
                         decoded_sso, grant.code, client.secret_key
