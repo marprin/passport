@@ -1,10 +1,10 @@
 from oauth.models import Client
+from user.models import User
 from common.constants import GeneralError, SignatureOrSSONotPresent, ClientNotFound
 from django.conf import settings
 from importlib import import_module
 from oauth.services import (
     validate_client,
-    generate_grant_token_from_user_id,
     structure_response_url,
 )
 from django.core import signing
@@ -25,7 +25,6 @@ class OauthSignatureMiddleware:
     def __init__(self, get_response):
         self.get_response = get_response
         self._process_path = (
-            # reverse("oauth:signature"),
             reverse("oauth:index"),
             reverse("oauth:verify"),
         )
@@ -60,24 +59,27 @@ class OauthSignatureMiddleware:
             # If the session for user_id is set, no need to login anymore
             dec_user_id = request.session.get("user_id", None)
             if dec_user_id is not None:
-                # We have the data so only need to return the grant token
+                user_id = signing.loads(dec_user_id)
+
                 try:
-                    user_id = signing.loads(dec_user_id)
-                    grant = generate_grant_token_from_user_id(user_id, client)
-                    redirect_to = structure_response_url(
-                        decoded_sso, grant.code, client.secret_key
-                    )
-                    # If the token exist, empty the decoded_sso as we don't want to save it anymore
+                    user = User.objects.non_blocked_user.filter(pk=user_id).get()
+                except User.DoesNotExist as e:
+                    logger.error(f"Error on get user {str(e)}")
+                    request.session["user_id"] = None
+                    return HttpResponseRedirect(reverse("oauth:index"))
+
+                try:
+                    redirect_url = generate_response(client, decoded_sso, user)
                     request.session["decoded_sso"] = None
                     return HttpResponseRedirect(redirect_to)
-                except ValueError as e:
-                    logger.error(f"Error on get user: {str(e)}")
-                    request.session["user_id"] = None
+                except (ValueError, NotImplementedError) as e:
+                    logger.error(f"Error in middleware to generate response: {str(e)}")
+                    return HttpResponseBadRequest(e)
                 except Exception as e:
                     logger.error(
                         f"Error while session for user_id still exists: {str(e)}"
                     )
-                return HttpResponseServerError(GeneralError)
+                    return HttpResponseServerError(GeneralError)
 
             # Put the decoded_sso in session
             request.session["decoded_sso"] = decoded_sso

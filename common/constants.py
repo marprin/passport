@@ -10,3 +10,8 @@ SignatureOrSSONotPresent = (
 GeneralError = "Please try again in a moment"
 RedirectionNotPresent = "Redirection URL not present"
 EmailorPasswordNotValid = "Email or Password is not found or valid"
+InvalidTypeResponse = "No matching type found or not present"
+InternalServerError = "Internal Server Error"
+
+RESPONSE_TYPE_GRANT = "grant"
+RESPONSE_TYPE_JWT = "jwt"

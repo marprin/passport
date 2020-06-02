@@ -13,6 +13,7 @@ from common.constants import (
     RedirectionNotPresent,
     EmailorPasswordNotValid,
     ClientNotFound,
+    InternalServerError,
 )
 from common.utils import get_client_ip
 from oauth.forms import LoginForm
@@ -20,6 +21,7 @@ from oauth.models import AccessToken, Verification, Grant, Client
 from oauth.services import (
     structure_response_url,
     check_user,
+    generate_response,
 )
 from user.models import LoginEvent
 from uuid import uuid4
@@ -86,11 +88,18 @@ class OauthLoginView(View):
             # TODO: Handle the OTP request and redirect to verify page
             return HttpResponseRedirect(reverse("oauth:verify"))
 
-        # Create the grant
-        grant = Grant.objects.create_grant(code=str(uuid4()), client=client, user=user,)
-        redirect_url = structure_response_url(
-            decoded_sso, grant.code, client.secret_key
-        )
+        # Generate response
+        try:
+            redirect_url = generate_response(client, decoded_sso, user)
+        except ValueError as e:
+            logger.error(f"Error in generate response: {str(e)}")
+            messages.error(request, [e], extra_tags="general_errors")
+            return HttpResponseRedirect(reverse("oauth:index"))
+        except Exception as e:
+            logger.error(f"Error in generate response: {str(e)}")
+            messages.error(request, [InternalServerError], extra_tags="general_errors")
+            return HttpResponseRedirect(reverse("oauth:index"))
+
         request.session["decoded_sso"] = None
         request.session["user_id"] = signing.dumps(user.id)
         return HttpResponseRedirect(redirect_url)

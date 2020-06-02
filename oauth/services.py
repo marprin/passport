@@ -1,12 +1,15 @@
-from oauth.models import Grant, Client, AccessToken
+from oauth.models import Grant, Client
 from common.constants import (
     UserNotFound,
     InvalidPayload,
     MissingClientKey,
     ClientNotFound,
     SignatureNotValid,
+    RESPONSE_TYPE_GRANT,
+    RESPONSE_TYPE_JWT,
+    InvalidTypeResponse,
 )
-from user.models import User, LoginEvent
+from user.models import User
 from common.utils import merge_url_with_new_query_string
 from django.core.cache import cache
 from uuid import uuid4
@@ -14,7 +17,6 @@ import base64
 import bcrypt
 import json
 import hashlib
-import requests
 
 
 def check_user(email: str, password: str):
@@ -79,10 +81,13 @@ def validate_client(sig: str, sso: str) -> (Client, dict):
     return client, dict_sso
 
 
-def generate_grant_token_from_user_id(id: int, client: Client) -> Grant:
-    try:
-        user = User.objects.non_blocked_user().filter(pk=id).get()
-    except User.DoesNotExist:
-        raise ValueError(UserNotFound)
-
-    return Grant.objects.create_grant(code=str(uuid4()), client=client, user=user)
+def generate_response(client: Client, decoded_sso: str, user: User) -> str:
+    response_type = decoded_sso.get("type", "grant")
+    if response_type == RESPONSE_TYPE_GRANT:
+        grant = Grant.objects.create_grant(code=str(uuid4()), client=Client, user=User)
+        return structure_response_url(decoded_sso, grant.code, client.secret_key)
+    elif response_type == RESPONSE_TYPE_JWT:
+        # Need to handle the JWT response
+        raise NotImplementedError(InvalidTypeResponse)
+    else:
+        raise ValueError(InvalidTypeResponse)
