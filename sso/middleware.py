@@ -6,6 +6,7 @@ from importlib import import_module
 from oauth.services import (
     validate_client,
     structure_response_url,
+    generate_response,
 )
 from django.core import signing
 from django.http import (
@@ -62,14 +63,14 @@ class OauthSignatureMiddleware:
                 user_id = signing.loads(dec_user_id)
 
                 try:
-                    user = User.objects.non_blocked_user.filter(pk=user_id).get()
+                    user = User.objects.non_blocked_user().filter(pk=user_id).get()
                 except User.DoesNotExist as e:
                     logger.error(f"Error on get user {str(e)}")
                     request.session["user_id"] = None
                     return HttpResponseRedirect(reverse("oauth:index"))
 
                 try:
-                    redirect_url = generate_response(client, decoded_sso, user)
+                    redirect_to = generate_response(client, decoded_sso, user)
                     request.session["decoded_sso"] = None
                     return HttpResponseRedirect(redirect_to)
                 except (ValueError, NotImplementedError) as e:
