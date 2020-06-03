@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     "healthz",
     "django_prometheus",
     "django_user_agents",
+    "rest_framework",
 ]
 
 MIDDLEWARE = [
