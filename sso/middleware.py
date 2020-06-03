@@ -5,7 +5,6 @@ from django.conf import settings
 from importlib import import_module
 from oauth.services import (
     validate_client,
-    structure_response_url,
     generate_response,
 )
 from django.core import signing

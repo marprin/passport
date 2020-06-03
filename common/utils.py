@@ -1,4 +1,8 @@
 from urllib.parse import urlencode, urlparse, parse_qs
+import bcrypt
+import json
+import base64
+import hashlib
 
 
 def merge_url_with_new_query_string(url: str, new_params: dict) -> str:
@@ -19,3 +23,27 @@ def get_client_ip(request):
     else:
         ip = request.META.get("REMOTE_ADDR")
     return ip
+
+
+def validate_password(hash_password: str, password: str) -> bool:
+    if bcrypt.checkpw(password.encode("utf-8"), hash_password.encode("utf-8")):
+        return True
+    return False
+
+
+def structure_response_url(sso_payload: dict, grant_token: str, secret_key: str) -> str:
+    redirect_url = sso_payload["redirect_to"]
+
+    sso_payload["grant_token"] = grant_token
+    buf = json.dumps(sso_payload)
+
+    sso = base64.b64encode(buf.encode("utf-8")).decode("utf-8")
+    sso_w_secret = buf + secret_key
+    sig = hashlib.sha512(sso_w_secret.encode("utf-8")).hexdigest()
+
+    new_params = {
+        "sso": sso,
+        "sig": sig,
+    }
+
+    return merge_url_with_new_query_string(redirect_url, new_params)

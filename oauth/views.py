@@ -9,22 +9,15 @@ from django.contrib.messages import get_messages
 from django.urls import reverse
 from django.core import signing
 from common.constants import (
-    GeneralError,
     RedirectionNotPresent,
     EmailorPasswordNotValid,
     ClientNotFound,
     InternalServerError,
 )
-from common.utils import get_client_ip
 from oauth.forms import LoginForm
-from oauth.models import AccessToken, Verification, Grant, Client
-from oauth.services import (
-    structure_response_url,
-    check_user,
-    generate_response,
-)
-from user.models import LoginEvent
-from uuid import uuid4
+from oauth.models import Verification, Client
+from oauth.services import generate_response
+from user.services import create_login_event, check_user
 import json
 import logging
 
@@ -69,18 +62,7 @@ class OauthLoginView(View):
             user = check_user(email, password)
         except Exception as e:
             logger.error(f"Error user not found: {str(e)}")
-            LoginEvent.objects.create(
-                email=email,
-                client=client,
-                ip_address=get_client_ip(request),
-                platform=request.user_agent.os.family,
-                platform_version=request.user_agent.os.version_string,
-                browser=request.user_agent.browser.family,
-                browser_version=request.user_agent.browser.version_string,
-                device=request.user_agent.device.brand,
-                device_version=request.user_agent.device.model,
-                action=f"{str(e)}",
-            )
+            create_login_event(request, email, client, f"{str(e)}")
             messages.error(request, EmailorPasswordNotValid, extra_tags="email")
             return HttpResponseRedirect(reverse("oauth:index"))
 
