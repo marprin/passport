@@ -23,4 +23,5 @@ urlpatterns = [
     path("healthz", healthz),
     # This will expose /metrics as already included in the prometheus lib
     path("monitoring/", include("django_prometheus.urls")),
+    path("api-auth/", include("rest_framework.urls")),
 ]
