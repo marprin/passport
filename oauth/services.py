@@ -43,7 +43,7 @@ def validate_client(sig: str, sso: str) -> (Client, dict):
     return client, dict_sso
 
 
-def generate_response(client: Client, decoded_sso: str, user: User) -> str:
+def generate_response(client: Client, decoded_sso: dict, user: User) -> str:
     response_type = decoded_sso.get("type", "grant")
     if response_type == RESPONSE_TYPE_GRANT:
         grant = Grant.objects.create_grant(code=str(uuid4()), client=client, user=user)
