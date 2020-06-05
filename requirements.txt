@@ -4,7 +4,7 @@ cffi==1.10.0
 chardet==3.0.4
 coverage==4.4.1
 DateTime==4.2
-Django==1.11.23
+Django==1.11.29
 djangorestframework==3.6.3
 gunicorn==19.7.1
 idna==2.5
