@@ -9,7 +9,7 @@ from django.contrib.messages import get_messages
 from django.urls import reverse
 from django.core import signing
 from common.constants import (
-    RedirectionNotPresent,
+    CallbackURLNotPresent,
     EmailorPasswordNotValid,
     ClientNotFound,
     InternalServerError,
@@ -91,7 +91,7 @@ class LogoutView(View):
     def get(self, request, *args, **kwargs):
         redirect_url = request.GET.get("redirect_to", None)
         if redirect_url is None:
-            return HttpResponseBadRequest(RedirectionNotPresent)
+            return HttpResponseBadRequest(CallbackURLNotPresent)
 
         # Remove user_id
         try:

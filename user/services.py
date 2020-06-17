@@ -1,7 +1,7 @@
-from user.models import LoginEvent, User
-from oauth.models import Client
-from common.utils import get_client_ip, validate_password
 from common.constants import UserNotFound
+from common.utils import get_client_ip, validate_password
+from oauth.models import Client
+from user.models import LoginEvent, User
 
 
 def create_login_event(request, email: str, client: Client, action: str):

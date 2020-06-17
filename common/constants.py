@@ -8,10 +8,11 @@ SignatureOrSSONotPresent = (
     "Please return to your partner homepage and do login from there."
 )
 GeneralError = "Please try again in a moment"
-RedirectionNotPresent = "Redirection URL not present"
+CallbackURLNotPresent = "Callback URL not present"
 EmailorPasswordNotValid = "Email or Password is not found or valid"
 InvalidTypeResponse = "No matching type found or not present"
 InternalServerError = "Internal Server Error"
+UserSessionNotFound = "User session not found"
 
 RESPONSE_TYPE_GRANT = "grant"
 RESPONSE_TYPE_JWT = "jwt"

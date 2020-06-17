@@ -1,8 +1,8 @@
 from django.test import TestCase
-from user.models import User, LoginEvent, Device
-from user.tests.faker.fake import UserModelData
 from oauth.models import Client
 from oauth.tests.faker.fake import ClientModelData
+from user.models import User, LoginEvent, Device
+from user.tests.faker.fake import UserModelData
 from uuid import uuid4
 
 

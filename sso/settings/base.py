@@ -61,7 +61,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "django_user_agents.middleware.UserAgentMiddleware",
-    "sso.middleware.OauthSignatureMiddleware",
+    "common.middleware.OauthSignatureMiddleware",
     "django_prometheus.middleware.PrometheusAfterMiddleware",
 ]
 

@@ -1,11 +1,11 @@
 from django.test import TestCase
-from oauth.services import validate_client, generate_response
+from common.constants import RESPONSE_TYPE_JWT
+from common.utils import structure_response_url
 from oauth.models import Client, Grant
+from oauth.services import validate_client, generate_response
 from oauth.tests.faker.fake import ClientModelData
 from user.models import User
 from user.tests.faker.fake import UserModelData
-from common.constants import RESPONSE_TYPE_JWT
-from common.utils import structure_response_url
 
 
 class TestGenerateResponse(TestCase):

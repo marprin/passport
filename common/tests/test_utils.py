@@ -7,10 +7,10 @@ from common.utils import (
     structure_response_url,
 )
 from urllib.parse import urlencode
-import bcrypt
-import json
-import hashlib
 import base64
+import bcrypt
+import hashlib
+import json
 
 
 class TestUtilsMergeUrlWithNewQueryString(TestCase):

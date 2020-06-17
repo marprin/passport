@@ -1,4 +1,4 @@
-from oauth.models import Grant, Client
+from common.utils import structure_response_url, get_clean_url
 from common.constants import (
     InvalidPayload,
     MissingClientKey,
@@ -7,17 +7,20 @@ from common.constants import (
     RESPONSE_TYPE_GRANT,
     RESPONSE_TYPE_JWT,
     InvalidTypeResponse,
+    CallbackURLNotPresent,
 )
+from oauth.models import Grant, Client
+from urllib.parse import unquote
 from user.models import User, LoginEvent
-from common.utils import structure_response_url
-from django.core.cache import cache
 from uuid import uuid4
 import base64
-import json
 import hashlib
+import json
 
 
 def validate_client(sig: str, sso: str) -> (Client, dict):
+    sig = unquote(sig)
+    sso = unquote(sso)
     # Need to implement cache to reduce call into DB
     json_sso = base64.b64decode(sso).decode("utf-8")
     try:
@@ -31,7 +34,17 @@ def validate_client(sig: str, sso: str) -> (Client, dict):
         raise KeyError(MissingClientKey)
 
     try:
-        client = Client.objects.active().filter(client_key=client_key).get()
+        callback_url = dict_sso["callback_url"]
+    except KeyError:
+        raise KeyError(CallbackURLNotPresent)
+
+    try:
+        client = (
+            Client.objects.active()
+            .filter(client_key=client_key)
+            .filter(callback_url=get_clean_url(callback_url))
+            .get()
+        )
     except Client.DoesNotExist:
         raise Client.DoesNotExist(ClientNotFound)
 

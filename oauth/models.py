@@ -1,7 +1,7 @@
+from django.conf import settings
 from django.db import models
 from django.utils import timezone
 from datetime import timedelta
-from django.conf import settings
 
 
 class ClientQuerySet(models.query.QuerySet):
@@ -14,6 +14,7 @@ class Client(models.Model):
     client_key = models.CharField(max_length=255, unique=True)
     secret_key = models.CharField(max_length=255, unique=True)
     revoked = models.BooleanField(max_length=1, default=False)
+    callback_url = models.CharField(max_length=255)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

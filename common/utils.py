@@ -1,8 +1,13 @@
 from urllib.parse import urlencode, urlparse, parse_qs
-import bcrypt
-import json
 import base64
+import bcrypt
 import hashlib
+import json
+
+
+def get_clean_url(url: str) -> str:
+    url_components = urlparse(url)
+    return url_components._replace(query={}).geturl()
 
 
 def merge_url_with_new_query_string(url: str, new_params: dict) -> str:

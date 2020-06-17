@@ -1,11 +1,11 @@
 from django.test import TestCase
 from django.test.client import RequestFactory
-from user.services import create_login_event, check_user
-from user.models import LoginEvent, User
-from user.tests.faker.fake import UserModelData
 from common.constants import UserNotFound
 from oauth.models import Client
 from oauth.tests.faker.fake import ClientModelData
+from user.models import LoginEvent, User
+from user.services import create_login_event, check_user
+from user.tests.faker.fake import UserModelData
 
 
 class TestCreateLoginEvent(TestCase):
