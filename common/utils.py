@@ -2,6 +2,7 @@ from urllib.parse import urlencode, urlparse, parse_qs
 import base64
 import bcrypt
 import hashlib
+import hmac
 import json
 
 
@@ -40,11 +41,12 @@ def structure_response_url(sso_payload: dict, grant_token: str, secret_key: str)
     redirect_url = sso_payload["redirect_to"]
 
     sso_payload["grant_token"] = grant_token
-    buf = json.dumps(sso_payload)
+    buf = json.dumps(sso_payload, separators=(",", ":"))
 
     sso = base64.b64encode(buf.encode("utf-8")).decode("utf-8")
-    sso_w_secret = buf + secret_key
-    sig = hashlib.sha512(sso_w_secret.encode("utf-8")).hexdigest()
+    sig = hmac.new(
+        secret_key.encode("utf-8"), buf.encode("utf-8"), hashlib.sha512
+    ).hexdigest()
 
     new_params = {
         "sso": sso,

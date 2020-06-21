@@ -1,6 +1,7 @@
 from django.test import TestCase
 from django.test.client import RequestFactory
 from common.utils import (
+    get_clean_url,
     merge_url_with_new_query_string,
     get_client_ip,
     validate_password,
@@ -10,7 +11,22 @@ from urllib.parse import urlencode
 import base64
 import bcrypt
 import hashlib
+import hmac
 import json
+
+
+class TestGetCleanURL(TestCase):
+    def test_get_clean_url(self):
+        url = "http://localhost/oauth/callback"
+        exp = "http://localhost/oauth/callback"
+        clean_url = get_clean_url(url)
+        self.assertEqual(exp, clean_url)
+
+    def test_get_clean_url_from_url_with_query_string(self):
+        url = "http://localhost/oauth/callback?type=login&action=login"
+        exp = "http://localhost/oauth/callback"
+        clean_url = get_clean_url(url)
+        self.assertEqual(exp, clean_url)
 
 
 class TestUtilsMergeUrlWithNewQueryString(TestCase):
@@ -83,9 +99,11 @@ class TestStructureResponseUrl(TestCase):
             "redirect_to": "http://localhost:9000/oauth/callback",
             "grant_token": self.grant_token,
         }
-        buf = json.dumps(sso_payload)
+        buf = json.dumps(sso_payload, separators=(",", ":"))
         sso = base64.b64encode(buf.encode("utf-8")).decode("utf-8")
-        sig = hashlib.sha512((buf + self.secret_key).encode("utf-8")).hexdigest()
+        sig = hmac.new(
+            self.secret_key.encode("utf-8"), buf.encode("utf-8"), hashlib.sha512
+        ).hexdigest()
         params = {
             "sso": sso,
             "sig": sig,
@@ -104,9 +122,11 @@ class TestStructureResponseUrl(TestCase):
             "grant_token": self.grant_token,
         }
 
-        buf = json.dumps(sso_payload_query)
+        buf = json.dumps(sso_payload_query, separators=(",", ":"))
         sso = base64.b64encode(buf.encode("utf-8")).decode("utf-8")
-        sig = hashlib.sha512((buf + self.secret_key).encode("utf-8")).hexdigest()
+        sig = hmac.new(
+            self.secret_key.encode("utf-8"), buf.encode("utf-8"), hashlib.sha512
+        ).hexdigest()
         params = {
             "type": "success",
             "sso": sso,

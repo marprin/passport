@@ -15,10 +15,7 @@ logger = logging.getLogger(__name__)
 class OauthSignatureMiddleware:
     def __init__(self, get_response):
         self.get_response = get_response
-        self._process_path = (
-            reverse("oauth:index"),
-            reverse("oauth:verify"),
-        )
+        self._process_path = (reverse("oauth:index"),)
 
     def __call__(self, request):
         if request.path in self._process_path:
@@ -34,23 +31,20 @@ class OauthSignatureMiddleware:
                 if sig is None or sso is None:
                     raise ValueError(SignatureOrSSONotPresent)
 
-                client, decoded_sso = self.validate_client(sig, sso)
+                client, decoded_sso = validate_client(sig, sso)
 
                 redirect_to = generate_response(client, decoded_sso, user)
                 return HttpResponseRedirect(redirect_to)
-            except User.DoesNotExist as e:
+            except (User.DoesNotExist, BadSignature) as e:
                 request.session["user_id"] = None
                 logger.info(f"In Middleware: {str(e)}")
             except (
-                BadSignature,
                 ValueError,
                 KeyError,
                 Client.DoesNotExist,
                 NotImplementedError,
             ) as e:
                 logger.error(f"In Middleware: {str(e)}")
-            except Exception as e:
-                logger.error(f"In Middleware unknown error: {str(e)}")
 
         # Handle the request in view
         response = self.get_response(request)
