@@ -15,6 +15,7 @@ from user.models import User, LoginEvent
 from uuid import uuid4
 import base64
 import hashlib
+import hmac
 import json
 
 
@@ -34,7 +35,7 @@ def validate_client(sig: str, sso: str) -> (Client, dict):
         raise KeyError(MissingClientKey)
 
     try:
-        callback_url = dict_sso["callback_url"]
+        callback_url = dict_sso["redirect_to"]
     except KeyError:
         raise KeyError(CallbackURLNotPresent)
 
@@ -48,8 +49,9 @@ def validate_client(sig: str, sso: str) -> (Client, dict):
     except Client.DoesNotExist:
         raise Client.DoesNotExist(ClientNotFound)
 
-    sso_w_secret = json_sso + client.secret_key
-    created_sig = hashlib.sha512(sso_w_secret.encode("utf-8")).hexdigest()
+    created_sig = hmac.new(
+        client.secret_key.encode("utf-8"), json_sso.encode("utf-8"), hashlib.sha512
+    ).hexdigest()
     if created_sig != sig:
         raise ValueError(SignatureNotValid)
 
@@ -57,7 +59,7 @@ def validate_client(sig: str, sso: str) -> (Client, dict):
 
 
 def generate_response(client: Client, decoded_sso: dict, user: User) -> str:
-    response_type = decoded_sso.get("type", "grant")
+    response_type = decoded_sso.get("token_type", "grant")
     if response_type == RESPONSE_TYPE_GRANT:
         grant = Grant.objects.create_grant(code=str(uuid4()), client=client, user=user)
         return structure_response_url(decoded_sso, grant.code, client.secret_key)

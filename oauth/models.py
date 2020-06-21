@@ -38,7 +38,7 @@ class IPAddress(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return self.client.name
+        return self.ip_address
 
     def is_authorized_ipaddress(ip_address):
         return IPAddress.objects.filter(ip_address=ip_address).filter(revoked=False)
@@ -62,7 +62,10 @@ class GrantQuerySet(models.query.QuerySet):
         return self.filter(revoked=False)
 
     def not_expired(self):
-        return self.filter(expired_at__lte=timezone.now())
+        return self.filter(expired_at__gte=timezone.now())
+
+    def valid_token(self):
+        return self.active().not_expired()
 
 
 class Grant(models.Model):
